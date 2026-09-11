@@ -53,7 +53,7 @@ jobs:
       - name: Install Gitleaks
         run: |
           curl -sSfL \
-            https://raw.githubusercontent.com/gitleaks/gitleaks/master/install.sh \
+            "https://raw.githubusercontent.com/gitleaks/gitleaks/master/install.sh" \
             | sh -s -- -b "$HOME/.local/bin"
 
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
