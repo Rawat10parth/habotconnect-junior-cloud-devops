@@ -1,0 +1,108 @@
+name: Secure CI/CD Gate
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  security-gate:
+    name: Fail-Closed Security Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Check Terraform formatting
+        working-directory: terraform
+        run: |
+          terraform fmt -check -recursive
+
+      - name: Validate Terraform
+        working-directory: terraform
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install YAML linter
+        run: |
+          python -m pip install --upgrade pip
+          pip install yamllint
+
+      - name: Lint YAML files
+        run: |
+          yamllint .github/workflows
+
+      - name: Install Gitleaks
+        run: |
+          curl -sSfL \
+            https://raw.githubusercontent.com/gitleaks/gitleaks/master/install.sh \
+            | sh -s -- -b "$HOME/.local/bin"
+
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Scan repository for hardcoded secrets
+        run: |
+          gitleaks detect \
+            --source . \
+            --redact \
+            --exit-code 1
+
+      - name: Verify required project structure
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          required_files=(
+            "terraform/main.tf"
+            "terraform/variables.tf"
+            "terraform/outputs.tf"
+            "terraform/versions.tf"
+            "terraform/storage.tf"
+            "terraform/iam.tf"
+            "terraform/bigquery.tf"
+            ".github/workflows/ci.yml"
+          )
+
+          for file in "${required_files[@]}"; do
+            if [[ ! -f "$file" ]]; then
+              echo "FAIL-CLOSED: Required file missing: $file"
+              exit 1
+            fi
+          done
+
+          echo "Required project structure verified."
+
+  python-validation:
+    name: Python Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Compile Python files
+        run: |
+          python -m compileall -q django tests
