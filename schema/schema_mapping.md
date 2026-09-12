@@ -34,41 +34,41 @@ not presented as requirements supplied by HabotConnect.
 
 ## 4. DCYN Decision Logic
 
-### D1 — Required Information
+### DCYN-1 = Required Information
 
 Is all required onboarding information present?
 
-- YES → Continue to D2
-- NO → Reject record
+- YES → Continue to DCYN-2
+- NO → Reject and quarantine record
 
-### D2 — Data Type
+### DCYN-2 = Data Type
 
 Are all fields supplied using the expected data type?
 
-- YES → Continue to D3
-- NO → Reject record
+- YES → Continue to DCYN-3
+- NO → Reject and quarantine record
 
-### D3 — Field Validation
+### DCYN-3 = Field Validation
 
 Do all values satisfy their defined validation constraints?
 
-- YES → Continue to D4
-- NO → Reject record
+- YES → Continue to DCYN-4
+- NO → Reject and quarantine record
 
-### D4 — Binary Decision Fields
+### DCYN-4 = Binary Decision
 
 Are all DCYN decision fields explicitly represented as
 boolean Yes/No values?
 
-- YES → Continue to D5
-- NO → Reject record
+- YES → Continue to DCYN-5
+- NO → Reject and quarantine record
 
-### D5 — Onboarding Decision
+### DCYN-5 = Final Onboarding Decision
 
 Does the record satisfy all mandatory onboarding conditions?
 
-- YES → Accept / Continue processing
-- NO → Reject / Stop processing
+- YES → Accept and continue processing
+- NO → Reject and quarantine record
 
 ## 5. Binary Decision Fields
 
@@ -106,9 +106,19 @@ values.
 ## 7. Processing Outcome
 
 VALID INPUT
+
 → Accept onboarding record
 
+→ Continue downstream processing
+
+→ Write validated record to D1
+
 INVALID INPUT
+
 → Reject onboarding record
+
 → Return validation errors
-→ Do not continue downstream processing
+
+→ Quarantine record
+
+→ Do not write the record to D1

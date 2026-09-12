@@ -4,6 +4,8 @@
 # .tfstate files
 *.tfstate
 *.tfstate.*
+*.tfplan
+tfplan
 
 # Crash log files
 crash.log
@@ -49,3 +51,4 @@ __pycache__/
 
 # Generated pipeline output
 pipeline/output/
+pipeline/d0_raw/

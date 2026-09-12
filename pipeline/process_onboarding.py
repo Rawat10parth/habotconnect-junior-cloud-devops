@@ -19,7 +19,12 @@ from student_onboarding.serializers import StudentOnboardingSerializer
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-INPUT_PATH = PROJECT_ROOT / "schema" / "student_onboarding_batch.json"
+D0_INPUT_PATH = (
+    PROJECT_ROOT
+    / "pipeline"
+    / "d0_raw"
+    / "student_onboarding_batch.json"
+)
 OUTPUT_DIR = PROJECT_ROOT / "pipeline" / "output"
 
 D1_OUTPUT_PATH = OUTPUT_DIR / "d1_valid_records.json"
@@ -38,7 +43,7 @@ def format_validation_errors(errors):
 
 
 def process_batch():
-    with INPUT_PATH.open("r", encoding="utf-8") as file:
+    with D0_INPUT_PATH.open("r", encoding="utf-8") as file:
         batch = json.load(file)
 
     students = batch.get("students", [])
@@ -46,9 +51,11 @@ def process_batch():
     valid_records = []
     quarantine_records = []
 
-    print("Student Onboarding Batch Pipeline")
+    print("Student Onboarding D0 -> DCYN -> D1 Pipeline")
     print("=" * 50)
     print(f"Input records: {len(students)}\n")
+    print(f"D0 source: {D0_INPUT_PATH}")
+    print()
 
     for index, student in enumerate(students, start=1):
         serializer = StudentOnboardingSerializer(data=student)
