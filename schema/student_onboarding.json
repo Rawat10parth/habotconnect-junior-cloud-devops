@@ -1,0 +1,11 @@
+{
+  "student_name": "Rahul Sharma",
+  "email": "rahul@example.com",
+  "phone": "9876543210",
+  "age": 21,
+  "has_passport": true,
+  "has_academic_documents": true,
+  "english_proficiency": true,
+  "willing_to_relocate": true,
+  "has_relevant_experience": false
+}
