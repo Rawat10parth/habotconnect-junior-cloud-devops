@@ -66,7 +66,11 @@ def process_batch(input_path=None, output_dir=None):
         serializer = StudentOnboardingSerializer(data=student)
 
         if serializer.is_valid():
-            valid_records.append(serializer.validated_data)
+            validated_record = serializer.validated_data.copy()
+            validated_record["access_scope"] = "ANALYTICS"
+
+            valid_records.append(validated_record)
+
             print(f"Student {index}: ACCEPTED -> D1")
         else:
             error_message = format_validation_errors(serializer.errors)

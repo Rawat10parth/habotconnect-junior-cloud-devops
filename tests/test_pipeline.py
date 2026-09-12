@@ -58,6 +58,16 @@ class BatchPipelineTests(unittest.TestCase):
             self.assertEqual(result["d1_records"], 6)
             self.assertEqual(result["quarantined"], 4)
 
+            d1_output_path = output_path / "d1_valid_records.json"
+
+            with d1_output_path.open("r", encoding="utf-8") as file:
+                d1_output = json.load(file)
+
+            self.assertEqual(d1_output["count"], 6)
+
+            for record in d1_output["records"]:
+                self.assertEqual(record["access_scope"], "ANALYTICS")
+
             self.assertTrue(
                 (output_path / "d1_valid_records.json").exists()
             )
