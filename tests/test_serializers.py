@@ -73,6 +73,33 @@ class StudentOnboardingSerializerTests(unittest.TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("has_passport", serializer.errors)
 
+    def test_string_yes_is_rejected_by_serializer(self):
+        payload = self.valid_payload.copy()
+        payload["has_passport"] = "yes"
+
+        serializer = StudentOnboardingSerializer(data=payload)
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("has_passport", serializer.errors)
+
+    def test_string_no_is_rejected_by_serializer(self):
+        payload = self.valid_payload.copy()
+        payload["has_passport"] = "no"
+
+        serializer = StudentOnboardingSerializer(data=payload)
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("has_passport", serializer.errors)
+
+    def test_unexpected_field_is_rejected(self):
+        payload = self.valid_payload.copy()
+        payload["unexpected_field"] = "not allowed"
+
+        serializer = StudentOnboardingSerializer(data=payload)
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("non_field_errors", serializer.errors)
+
 
 if __name__ == "__main__":
     unittest.main()

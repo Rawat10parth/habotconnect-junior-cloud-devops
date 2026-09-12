@@ -2,10 +2,22 @@ from rest_framework import serializers
 
 from .validators import (
     validate_age,
-    validate_dcyn,
     validate_phone,
     validate_student_name,
 )
+
+
+class StrictBooleanField(serializers.BooleanField):
+    """
+    Accept only actual JSON boolean values: true or false.
+    Strings such as "yes", "no", "true", and "false" are rejected.
+    """
+
+    def to_internal_value(self, data):
+        if not isinstance(data, bool):
+            self.fail("invalid")
+
+        return data
 
 
 class StudentOnboardingSerializer(serializers.Serializer):
@@ -31,37 +43,45 @@ class StudentOnboardingSerializer(serializers.Serializer):
         validators=[validate_age],
     )
 
-    has_passport = serializers.BooleanField(
-        required=True,
-        validators=[validate_dcyn],
-    )
+    has_passport = StrictBooleanField(required=True)
 
-    has_academic_documents = serializers.BooleanField(
-        required=True,
-        validators=[validate_dcyn],
-    )
+    has_academic_documents = StrictBooleanField(required=True)
 
-    english_proficiency = serializers.BooleanField(
-        required=True,
-        validators=[validate_dcyn],
-    )
+    english_proficiency = StrictBooleanField(required=True)
 
-    willing_to_relocate = serializers.BooleanField(
-        required=True,
-        validators=[validate_dcyn],
-    )
+    willing_to_relocate = StrictBooleanField(required=True)
 
-    has_relevant_experience = serializers.BooleanField(
-        required=True,
-        validators=[validate_dcyn],
-    )
+    has_relevant_experience = StrictBooleanField(required=True)
 
     def validate(self, attrs):
         """
-        Final deterministic DCYN decision.
-
-        All mandatory onboarding conditions must be satisfied.
+        Enforce the exact input schema and deterministic DCYN decision.
         """
+
+        expected_fields = {
+            "student_name",
+            "email",
+            "phone",
+            "age",
+            "has_passport",
+            "has_academic_documents",
+            "english_proficiency",
+            "willing_to_relocate",
+            "has_relevant_experience",
+        }
+
+        unexpected_fields = set(self.initial_data.keys()) - expected_fields
+
+        if unexpected_fields:
+            raise serializers.ValidationError(
+                {
+                    "non_field_errors": [
+                        "Unexpected fields: "
+                        + ", ".join(sorted(unexpected_fields))
+                    ]
+                }
+            )
+
         required_positive_conditions = (
             "has_passport",
             "has_academic_documents",
