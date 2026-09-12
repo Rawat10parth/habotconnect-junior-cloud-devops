@@ -42,19 +42,24 @@ def format_validation_errors(errors):
     return "; ".join(messages)
 
 
-def process_batch():
-    with D0_INPUT_PATH.open("r", encoding="utf-8") as file:
+def process_batch(input_path=None, output_dir=None):
+    input_path = Path(input_path) if input_path else D0_INPUT_PATH
+    output_dir = Path(output_dir) if output_dir else OUTPUT_DIR
+
+    d1_output_path = output_dir / "d1_valid_records.json"
+    quarantine_output_path = output_dir / "quarantine_records.json"
+
+    with input_path.open("r", encoding="utf-8") as file:
         batch = json.load(file)
 
     students = batch.get("students", [])
-
     valid_records = []
     quarantine_records = []
 
     print("Student Onboarding D0 -> DCYN -> D1 Pipeline")
     print("=" * 50)
-    print(f"Input records: {len(students)}\n")
-    print(f"D0 source: {D0_INPUT_PATH}")
+    print(f"Input records: {len(students)}")
+    print(f"D0 source: {input_path}")
     print()
 
     for index, student in enumerate(students, start=1):
@@ -62,7 +67,6 @@ def process_batch():
 
         if serializer.is_valid():
             valid_records.append(serializer.validated_data)
-
             print(f"Student {index}: ACCEPTED -> D1")
         else:
             error_message = format_validation_errors(serializer.errors)
@@ -76,12 +80,12 @@ def process_batch():
                 }
             )
 
-            print("Student {0}: REJECTED -> QUARANTINE".format(index))
+            print(f"Student {index}: REJECTED -> QUARANTINE")
             print(f"           Reason: {error_message}")
 
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    with D1_OUTPUT_PATH.open("w", encoding="utf-8") as file:
+    with d1_output_path.open("w", encoding="utf-8") as file:
         json.dump(
             {
                 "records": valid_records,
@@ -91,7 +95,7 @@ def process_batch():
             indent=2,
         )
 
-    with QUARANTINE_OUTPUT_PATH.open("w", encoding="utf-8") as file:
+    with quarantine_output_path.open("w", encoding="utf-8") as file:
         json.dump(
             {
                 "records": quarantine_records,
@@ -109,10 +113,10 @@ def process_batch():
     print(f"Quarantined:   {len(quarantine_records)}")
 
     print("\nD1 output:")
-    print(D1_OUTPUT_PATH)
+    print(d1_output_path)
 
     print("\nQuarantine output:")
-    print(QUARANTINE_OUTPUT_PATH)
+    print(quarantine_output_path)
 
     return {
         "total": len(students),
