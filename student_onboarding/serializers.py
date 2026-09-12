@@ -1,10 +1,7 @@
 from rest_framework import serializers
 
-from .validators import (
-    validate_age,
-    validate_phone,
-    validate_student_name,
-)
+from .models import StudentOnboarding
+from .validators import validate_phone, validate_student_name
 
 
 class StrictBooleanField(serializers.BooleanField):
@@ -20,7 +17,7 @@ class StrictBooleanField(serializers.BooleanField):
         return data
 
 
-class StudentOnboardingSerializer(serializers.Serializer):
+class StudentOnboardingSerializer(serializers.ModelSerializer):
     student_name = serializers.CharField(
         required=True,
         min_length=2,
@@ -35,12 +32,14 @@ class StudentOnboardingSerializer(serializers.Serializer):
 
     phone = serializers.CharField(
         required=True,
+        max_length=10,
         validators=[validate_phone],
     )
 
     age = serializers.IntegerField(
         required=True,
-        validators=[validate_age],
+        min_value=18,
+        max_value=60,
     )
 
     has_passport = StrictBooleanField(required=True)
@@ -53,12 +52,9 @@ class StudentOnboardingSerializer(serializers.Serializer):
 
     has_relevant_experience = StrictBooleanField(required=True)
 
-    def validate(self, attrs):
-        """
-        Enforce the exact input schema and deterministic DCYN decision.
-        """
-
-        expected_fields = {
+    class Meta:
+        model = StudentOnboarding
+        fields = [
             "student_name",
             "email",
             "phone",
@@ -68,19 +64,55 @@ class StudentOnboardingSerializer(serializers.Serializer):
             "english_proficiency",
             "willing_to_relocate",
             "has_relevant_experience",
-        }
+        ]
 
-        unexpected_fields = set(self.initial_data.keys()) - expected_fields
+    def to_internal_value(self, data):
+        """
+        Reject fields that are not explicitly defined in the schema.
+        """
+
+        unexpected_fields = set(data.keys()) - set(self.fields.keys())
 
         if unexpected_fields:
             raise serializers.ValidationError(
                 {
                     "non_field_errors": [
-                        "Unexpected fields: "
-                        + ", ".join(sorted(unexpected_fields))
+                        f"Unexpected fields: {', '.join(sorted(unexpected_fields))}"
                     ]
                 }
             )
+
+        return super().to_internal_value(data)
+
+    def validate(self, attrs):
+        """
+        Final deterministic DCYN decision.
+
+        DCYN fields must be real JSON booleans.
+        String representations such as "yes", "no",
+        "true", or "false" are rejected.
+        """
+
+        dcyn_fields = (
+            "has_passport",
+            "has_academic_documents",
+            "english_proficiency",
+            "willing_to_relocate",
+            "has_relevant_experience",
+        )
+
+        for field in dcyn_fields:
+            raw_value = self.initial_data.get(field)
+
+            if not isinstance(raw_value, bool):
+                raise serializers.ValidationError(
+                    {
+                        field: (
+                            "DCYN value must be a JSON boolean: "
+                            "true or false."
+                        )
+                    }
+                )
 
         required_positive_conditions = (
             "has_passport",

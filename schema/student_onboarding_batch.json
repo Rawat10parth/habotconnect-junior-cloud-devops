@@ -1,0 +1,115 @@
+{
+  "students": [
+    {
+      "student_name": "Rahul Sharma",
+      "email": "rahul@example.com",
+      "phone": "9876543210",
+      "age": 21,
+      "has_passport": true,
+      "has_academic_documents": true,
+      "english_proficiency": true,
+      "willing_to_relocate": true,
+      "has_relevant_experience": false
+    },
+    {
+      "student_name": "Priya Mehta",
+      "email": "priya@example.com",
+      "phone": "9876543211",
+      "age": 24,
+      "has_passport": true,
+      "has_academic_documents": true,
+      "english_proficiency": true,
+      "willing_to_relocate": true,
+      "has_relevant_experience": true
+    },
+    {
+      "student_name": "Arjun Verma",
+      "email": "arjun@example.com",
+      "phone": "9876543212",
+      "age": 17,
+      "has_passport": true,
+      "has_academic_documents": true,
+      "english_proficiency": true,
+      "willing_to_relocate": true,
+      "has_relevant_experience": false
+    },
+    {
+      "student_name": "Neha Kapoor",
+      "email": "neha@example.com",
+      "phone": "9876543213",
+      "age": 26,
+      "has_passport": true,
+      "has_academic_documents": true,
+      "english_proficiency": true,
+      "willing_to_relocate": false,
+      "has_relevant_experience": true
+    },
+    {
+      "student_name": "Rohan Singh",
+      "email": "rohan@example.com",
+      "phone": "98765",
+      "age": 23,
+      "has_passport": true,
+      "has_academic_documents": true,
+      "english_proficiency": true,
+      "willing_to_relocate": true,
+      "has_relevant_experience": false
+    },
+    {
+      "student_name": "Ananya Patel",
+      "email": "ananya@example.com",
+      "phone": "9876543215",
+      "age": 22,
+      "has_passport": true,
+      "has_academic_documents": true,
+      "english_proficiency": true,
+      "willing_to_relocate": true,
+      "has_relevant_experience": true
+    },
+    {
+      "student_name": "Karan Malhotra",
+      "email": "karan@example.com",
+      "phone": "9876543216",
+      "age": 25,
+      "has_passport": false,
+      "has_academic_documents": true,
+      "english_proficiency": true,
+      "willing_to_relocate": true,
+      "has_relevant_experience": true
+    },
+    {
+      "student_name": "Sneha Joshi",
+      "email": "sneha@example.com",
+      "phone": "9876543217",
+      "age": 28,
+      "has_passport": true,
+      "has_academic_documents": true,
+      "english_proficiency": true,
+      "willing_to_relocate": false,
+      "has_relevant_experience": false
+    },
+    {
+      "student_name": "Aditya Rao",
+      "email": "aditya@example.com",
+      "phone": "9876543218",
+      "age": 27,
+      "has_passport": true,
+      "has_academic_documents": true,
+      "english_proficiency": true,
+      "willing_to_relocate": true,
+      "has_relevant_experience": true,
+      "unexpected_field": "not allowed"
+    },
+    {
+      "student_name": "Ishita Shah",
+      "email": "ishita@example.com",
+      "phone": "9876543219",
+      "age": 23,
+      "has_passport": true,
+      "has_academic_documents": true,
+      "english_proficiency": true,
+      "willing_to_relocate": true,
+      "has_relevant_experience": true
+    }
+  ]
+}
